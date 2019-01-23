@@ -16,15 +16,24 @@ public:
       std::vector<std:: vector<int> > adj;
       int n,m = 0;
       int s = 0,t;
-      std::vector <int> color;
+      int removed_edges = 0;
+      std::vector <int> color,degree,v_cover;
       std::queue <int> q;
+      std::queue<int> degree_one,degree_two;
+
 
 public:
-      void add_edge(int v1,int v2);
-      void set_vertices(int vertices);
+      // void add_edge(int v1,int v2);
+      void set_vertices(int vertices,int edges);
       void take_input(char* argument);
       bool bipartite_dfs(int idx,int par);
       bool is_bipartite();
       void add_SourceSink();
+      void calc_degree();
+      bool reduction_rule1();
+      bool reduction_rule2();
+      void remove_vertex(int idx);
+
+
 
 };

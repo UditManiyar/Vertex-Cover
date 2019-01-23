@@ -1,23 +1,14 @@
 #include"graph.h"
-void graph::set_vertices(int no_vertices)
+void graph::set_vertices(int no_vertices,int edges)
 {
-      m =0;
+      m =edges;
       n = no_vertices;
       t = no_vertices+1;
       adj.resize(t+1);
       color.resize(t+1);
+      degree.resize(t+1);
 }
-void graph::add_edge(int v1,int v2)
-{
-      Edge a(v1,v2,1);
-      edges_list.push_back(a);
-      adj[v1].push_back(m++);
 
-      Edge b(v2,v1,0);
-      edges_list.push_back(b);
-      adj[v2].push_back(m++);
-
-}
 void graph::take_input(char* file_name)
 {
       /*Taking input from file*/
@@ -36,7 +27,7 @@ void graph::take_input(char* file_name)
 				line  = line.substr(5);
 				std::stringstream ss(line);
 				ss>>n>>m;
-				set_vertices(n);
+				set_vertices(n,m);
 				continue;
 			}
 			else
@@ -44,7 +35,15 @@ void graph::take_input(char* file_name)
 				int x,y;
 				std::stringstream ss(line);
 				ss>>x>>y;
-                        add_edge(x,y);
+
+                        Edge a(x,y,1);
+                        edges_list.push_back(a);
+                        adj[x].push_back(y);
+
+                        Edge b(y,x,0);
+                        edges_list.push_back(b);
+                        adj[y].push_back(x);
+
 			}
 
 		}
@@ -58,23 +57,23 @@ bool graph::bipartite_dfs(int idx,int par)
 {
       for(auto i :adj[idx])
 	{
-		Edge e = edges_list[i];
-		if(e.v2!=par)
+		// Edge e = edges_list[i];
+		if(i!=par)
 		{
-			if(color[idx]==color[e.v2])
+			if(color[idx]==color[i])
 			{
 				return false;
 			}
-			else if(color[e.v2]!=-1)
+			else if(color[i]!=-1)
 			{
 				continue;
 			}
-			else if(color[e.v2]==-1)
+			else if(color[i]==-1)
 			{
-				color[e.v2] = 1^color[idx];
+				color[i] = 1^color[idx];
 			}
 
-			if(!bipartite_dfs(e.v2,idx))
+			if(!bipartite_dfs(i,idx))
 				return false;
 		}
 	}
@@ -101,32 +100,110 @@ bool graph::is_bipartite()
       return true;
 
 }
-void graph::add_SourceSink()
+
+void graph::calc_degree()
 {
-
-      /*edges_list will be directed from color(0) to color(1)*/
-      for(int i = 0;i<edges_list.size();i++)
-      {
-            if(color[edges_list[i].v1]==0&&color[edges_list[i].v2]==1)
-            {
-                  edges_list[i].capacity = 1;
-            }
-            else
-            {
-                  edges_list[i].capacity = 0;
-            }
-
-      }
-
-      /*Connecting s to all vertices with color 0 and color 1 to t*/
+      fill(degree.begin(),degree.end(),0);
       for(int i = 1;i<=n;i++)
       {
-            if(color[i]==0)
-                  add_edge(s,i);
-
-
-            else if(color[i]==1)
-                  add_edge(i,t);
-
+            degree[i] = adj[i].size();
+            // std::cout<<degree[i]<<" ";
+            if(degree[i]==1)
+            {
+                  degree_one.push(i);
+            }
+            else if(degree[i]==2)
+            {
+                  degree_two.push(i);
+            }
       }
+}
+
+void graph::remove_vertex(int idx)
+{
+      for(auto i : adj[idx])
+      {
+            int pos = std::lower_bound(adj[i].begin(),adj[i].end(),idx)-adj[i].begin();
+            if(adj[i][pos]==idx)
+            {
+                  removed_edges++;
+                  adj[i].erase(adj[i].begin()+pos);
+                  degree[i] = adj[i].size();
+            }
+            if(adj[i].size()==1)
+            {
+                  degree_one.push(i);
+            }
+            else if(adj[i].size()==2)
+            {
+                  degree_two.push(i);
+            }
+      }
+      adj[idx].clear();
+      degree[idx] = adj[idx].size();
+}
+
+
+bool graph::reduction_rule1()
+{
+      bool flag = false;
+
+      while(!degree_one.empty())
+      {
+            flag = true;
+
+            int current = degree_one.front();
+            degree_one.pop();
+
+            if(adj[current].size()!=1)
+            {
+                  continue;
+            }
+            int neighbour = adj[current][0];
+
+            v_cover.push_back(neighbour);
+            remove_vertex(neighbour);
+            adj[current].clear();
+            degree[current] = adj[current].size();
+      }
+      //
+      // std::cout<<"Edges in graph : "<<m<<"\n";
+      //
+      // std::cout<<"No of Edges Removed : "<<removed_edges<<"\n\n";
+      return flag;
+}
+bool graph::reduction_rule2()
+{
+      bool flag = false;
+      while (!degree_two.empty())
+      {
+            flag = true;
+            int current = degree_two.front();
+            degree_two.pop();
+
+            if(adj[current].size()!=2)
+            {
+                  continue;
+            }
+            int neighbour1 = adj[current][0];
+            int neighbour2 = adj[current][1];
+
+            int pos1 = std::lower_bound(adj[neighbour1].begin(),adj[neighbour1].end(),neighbour2)-adj[neighbour1].begin();
+            int pos2 = std::lower_bound(adj[neighbour2].begin(),adj[neighbour2].end(),neighbour1)-adj[neighbour2].begin();
+
+            if(adj[neighbour1][pos1]==neighbour2&&adj[neighbour2][pos2]==neighbour1)
+            {
+                  remove_vertex(neighbour1);
+                  remove_vertex(neighbour2);
+                  remove_vertex(current);
+
+                  v_cover.push_back(neighbour1);
+                  v_cover.push_back(neighbour2);
+            }
+      }
+      //
+      // std::cout<<"Edges in graph : "<<m<<"\n";
+      //
+      // std::cout<<"No of Edges Removed : "<<removed_edges<<"\n\n";
+      return flag;
 }

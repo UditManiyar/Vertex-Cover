@@ -21,6 +21,8 @@ private:
 
 public:
       bipartite(graph G);
+      void add_edge(int v1,int v2);
+      void Graph_Modify();
       bool bfs();
       int dfs(int idx,int flow);
       int solve_dinic();

@@ -2,14 +2,13 @@
 
 bipartite::bipartite(graph G)
 {
-	adj = G.adj;
 	edges_list = G.edges_list;
 	color = G.color;
 	m = edges_list.size();
 	s= 0;
 	n = G.n;
 	t = G.n+1;
-
+	adj.resize(t+1);
 	level.resize(t+1);
 	start.resize(t+1);
 	alternating.resize(t+1);
@@ -17,6 +16,50 @@ bipartite::bipartite(graph G)
 	cover.resize(t+1);
 }
 
+void bipartite::add_edge(int v1,int v2)
+{
+      Edge a(v1,v2,1);
+      edges_list.push_back(a);
+      adj[v1].push_back(m++);
+
+      Edge b(v2,v1,0);
+      edges_list.push_back(b);
+      adj[v2].push_back(m++);
+
+}
+
+void bipartite::Graph_Modify()
+{
+
+      /*edges_list will be directed from color(0) to color(1)*/
+      for(int i = 0;i<edges_list.size();i++)
+      {
+
+		Edge e = edges_list[i];
+		adj[e.v1].push_back(i);
+            if(color[e.v1]==0&&color[e.v2]==1)
+            {
+                  edges_list[i].capacity = 1;
+            }
+            else
+            {
+                  edges_list[i].capacity = 0;
+            }
+
+      }
+
+      /*Connecting s to all vertices with color 0 and color 1 to t*/
+      for(int i = 1;i<=n;i++)
+      {
+            if(color[i]==0)
+                  add_edge(s,i);
+
+
+            else if(color[i]==1)
+                  add_edge(i,t);
+
+      }
+}
 /*Finds if there is a path between s and t and also Generates levels to the nodes*/
 bool bipartite::bfs()
 {
