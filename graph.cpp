@@ -1,4 +1,5 @@
 #include"graph.h"
+#include <limits.h>
 void graph::set_vertices(int no_vertices,int edges)
 {
       m =edges;
@@ -51,8 +52,104 @@ void graph::take_input(char* file_name)
 	}
 
 }
+void graph::reduction_edges()
+{
+      edges_list.clear();
+      for(int i = 1;i<=n;i++)
+      {
+            for(auto j : adj[i])
+            {
+                  if(i>j)
+                  {
+                        continue;
+                  }
+                  else
+                  {
 
+                        Edge a(i,j,1);
+                        edges_list.push_back(a);
+                        Edge b(j,i,0);
+                        edges_list.push_back(b);
+                  }
+            }
+      }
+      m = edges_list.size();
+}
+void graph::kernalization_network_flow()
+{
+      int sz = edges_list.size();
+      for(int i = 0;i<sz;i+=2)
+      {
+            Edge e(edges_list[i].v2,edges_list[i].v1+n,1);
+            edges_list.push_back(e);
+            Edge f(edges_list[i].v1+n,edges_list[i].v2,0);
+            edges_list.push_back(f);
 
+            edges_list[i].v2+=n;
+            edges_list[i+1].v1+=n;
+
+      }
+
+      std::cout <<"\n\n\n";
+      for(int i = 0;i<edges_list.size();i++)
+      {
+            Edge e = edges_list[i];
+            std::cout<<e.v1<<" "<<e.v2<<" "<<e.capacity<<"\n";
+
+      }
+      std::cout <<"\n\n\n";
+      color.resize(2*n+2);
+      for(int i = 0;i<=n;i++)
+      {
+            color[i]=0;
+      }
+      for(int i = n+1;i<=2*n+1;i++)
+      {
+            color[i] = 1;
+      }
+      n = 2*n;
+
+}
+void graph::kernelized_output(std::vector<int> &cover)
+{
+      n = n/2;
+
+      for(int i = 1;i<=n;i++)
+      {
+      	if(cover[i]==1&&cover[n+i]==1)
+      	{
+                  v_cover.push_back(cover[i]);
+                  std::cout<<i<<"a''";
+                  cover[i] = 1;
+                  cover[n+i] = 1;
+      	}
+      	else if(cover[i]^cover[n+i]==1)
+      	{
+                  cover[i] = 0;
+                  cover[n+i] = 1;
+      	}
+            else
+            {
+                  cover[i] = 1;
+            }
+      }
+
+      for(int i = 1;i<=n;i++)
+      {
+            if(cover[i]==1)
+            {
+                  remove_vertex(i);
+                  continue;
+            }
+            else
+            {
+                  continue;
+            }
+      }
+      color.resize(t+1);
+      reduction_edges();
+
+}
 bool graph::bipartite_dfs(int idx,int par)
 {
       for(auto i :adj[idx])
@@ -104,10 +201,11 @@ bool graph::is_bipartite()
 void graph::calc_degree()
 {
       fill(degree.begin(),degree.end(),0);
+      int sum = 0;
       for(int i = 1;i<=n;i++)
       {
             degree[i] = adj[i].size();
-            // std::cout<<degree[i]<<" ";
+            sum+=degree[i];
             if(degree[i]==1)
             {
                   degree_one.push(i);
@@ -117,6 +215,7 @@ void graph::calc_degree()
                   degree_two.push(i);
             }
       }
+
 }
 
 void graph::remove_vertex(int idx)
@@ -166,10 +265,6 @@ bool graph::reduction_rule1()
             adj[current].clear();
             degree[current] = adj[current].size();
       }
-      //
-      // std::cout<<"Edges in graph : "<<m<<"\n";
-      //
-      // std::cout<<"No of Edges Removed : "<<removed_edges<<"\n\n";
       return flag;
 }
 bool graph::reduction_rule2()
@@ -206,4 +301,36 @@ bool graph::reduction_rule2()
       //
       // std::cout<<"No of Edges Removed : "<<removed_edges<<"\n\n";
       return flag;
+}
+
+void graph::degeneracy()
+{
+      calc_degree();
+      int maxn = INT_MIN;
+      int idx = 1;
+      for(int j = 1;j<=n;j++)
+      {
+            int minx = INT_MAX;
+            for(int i = 1;i<=n;i++)
+            {
+                  if(degree[i]>0&&minx>degree[i])
+                  {
+                        idx = i;
+                        minx = std::min(minx,degree[i]);
+                  }
+            }
+            degree[idx] = 0;
+            if(minx==INT_MAX)
+            {
+                  break;
+            }
+            maxn = std::max(minx,maxn);
+            for(auto i :adj[idx])
+            {
+                  degree[i]--;
+            }
+      }
+      maxn = std::max(maxn,0);
+      // std::cout<<"Degeneracy : "
+      std::cout<<maxn<<"\n";
 }

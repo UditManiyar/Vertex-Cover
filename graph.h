@@ -28,12 +28,14 @@ public:
       void take_input(char* argument);
       bool bipartite_dfs(int idx,int par);
       bool is_bipartite();
-      void add_SourceSink();
       void calc_degree();
       bool reduction_rule1();
       bool reduction_rule2();
       void remove_vertex(int idx);
-
+      void reduction_edges();
+      void degeneracy();
+      void kernalization_network_flow();
+      void kernelized_output(std::vector<int> &cover);
 
 
 };

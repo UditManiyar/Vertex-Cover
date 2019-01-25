@@ -15,7 +15,15 @@ bipartite::bipartite(graph G)
 	matching.resize(t+1);
 	cover.resize(t+1);
 }
+std::vector<int> bipartite::kernelization()
+{
+	Graph_Modify();
+	int flow = solve_dinic();
+	print_vertexcover();
+	int n =n/2;
+	return cover;
 
+}
 void bipartite::add_edge(int v1,int v2)
 {
       Edge a(v1,v2,1);
@@ -148,7 +156,7 @@ int bipartite::solve_dinic()
 
 		fill(level.begin(),level.end(),-1);
 	}
-	std::cout<<total<<"\n";
+	// std::cout<<total<<"\n";
 	return total;
 }
 
@@ -215,13 +223,13 @@ void bipartite::print_vertexcover()
 		{
 			cnt++;
 			cover[i] = 1;
-			std::cout<<i<<" ";
+			// std::cout<<i<<" ";
 		}
 		else if(color[i]==1&&alternating[i]==1)
 		{
 			cnt++;
 			cover[i] = 1;
-			std::cout<<i<<" ";
+			// std::cout<<i<<" ";
 		}
 
 

@@ -10,7 +10,7 @@
 
 class bipartite
 {
-private:
+public:
       std::vector<Edge> edges_list;
       std::vector< std::vector<int> > adj;
       int n,m = 0;
@@ -29,5 +29,6 @@ public:
       void print_vertexcover();
       void chk();
       void travel_alternating(int i);
+      std::vector<int> kernelization();
 
 };
