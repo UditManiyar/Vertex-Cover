@@ -7,18 +7,18 @@ int main(int argv,char* arg[])
       graph G;
       G.take_input(arg[1]);
 
-int temp = 0;
+      int temp = 0;
 
       do
       {
             temp = G.removed_edges;
-            // G.calc_degree();
-            // while(G.reduction_rule1()||G.reduction_rule2())
-            // {
-            //
-            // }
-            // G.reduction_edges();
-            // G.calc_degree();
+            G.calc_degree();
+            while(G.reduction_rule1()||G.reduction_rule2())
+            {
+
+            }
+            G.reduction_edges();
+            G.calc_degree();
 
             G.kernalization_network_flow();
             bipartite S(G);
@@ -26,5 +26,18 @@ int temp = 0;
             G.kernelized_output(cover);
       }
       while(G.removed_edges!=temp);
-      std::cout<<G.removed_edges<<"\n";
+
+      while(!G.Claw_free())
+      {
+
+      }
+      //std::cout<<"\n\n\n";
+
+      //G.Claw_free();
+
+
+      // std::cout<<G.m<<"\n";
+
+
+
 }
