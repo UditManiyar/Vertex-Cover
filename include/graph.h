@@ -10,11 +10,13 @@
 #include<unordered_map>
 #include<utility>
 #include <algorithm>
+#include "adjlist.h"
 class graph
 {
 public:
       std::vector<Edge> edges_list;
-      std::vector<std:: vector<int> > adj;
+      adjlist adj;
+      //std::vector<std:: vector<int> > adj;
       int n,m = 0;
       int s = 0,t;
       int removed_edges = 0;
@@ -31,20 +33,12 @@ public:
       void take_input(char* argument);
       bool bipartite_dfs(int idx,int par);
       bool is_bipartite();
-      void calc_degree();
       bool reduction_rule1();
       bool reduction_rule2();
       void adjacent(int current, int neighbour1,int neighbour2);
       void non_adjacent(int current, int neighbour1,int neighbour2);
-      void remove_vertex(int idx);
-      void reduction_edges();
-      void degeneracy();
-      void kernalization_network_flow();
-      void kernelized_output(std::vector<int> &cover);
-      bool Closest_bipart();
-      int v_maxdeg();
-      int Greedy_Cover();
-      int Randomized_Matching();
+      //void kernalization_network_flow();
+      //void kernelized_output(std::vector<int> &cover);
       bool Claw_free();
 
 

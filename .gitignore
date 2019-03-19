@@ -1,0 +1,6 @@
+*.out
+*.hgr
+*.o
+*.txt
+/build
+*.cmake

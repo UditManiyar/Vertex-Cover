@@ -5,10 +5,11 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
 endif()
 
-project(Arkanoid LANGUAGES CXX)
+project(Pace LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+#" -Wall")
 
 #set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
@@ -23,4 +24,3 @@ add_executable(${EXECUTABLE_NAME} ${SOURCES})
 
 
 target_link_libraries(${EXECUTABLE_NAME})
-
