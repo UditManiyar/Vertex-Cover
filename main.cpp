@@ -17,8 +17,9 @@ int main(int argv,char* arg[])
 
            }
 
-           std::cout<<n<<" ---- "<<G.v_cover.size();
-
+           std::cout<<n<<" ---- "<<G.v_cover.size()<<"\n";
+           G.clawfree_chk();
+           std::cout<<"\n";
      // std::vector<std::pair<int,int> > sol = maxmatching::solve(G);
      //
      // std::cout<<sol.size();

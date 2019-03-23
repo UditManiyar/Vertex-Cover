@@ -10,6 +10,7 @@ public:
       std::vector<int> color,v_cover;
       int n = 0, m = 0;
       void get_input(char* file_name);
+      void add_edge(int x,int y);
       int remaining_vertices();
       void remove_duplicates();
       void set_vertices(int no_vertices);
@@ -23,5 +24,6 @@ public:
       void non_adjacent(int current, int neighbour1,int neighbour2);
       void kernalization_network_flow();
       void kernelized_output(std::vector<int> &cover);
+      bool clawfree_chk();
 };
 #endif // GRAPH_H

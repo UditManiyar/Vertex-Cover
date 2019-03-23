@@ -5,6 +5,8 @@
 #include <utility>
 #include <set>
 #include<iostream>
+#include <unordered_map>
+#include<algorithm>
 
 void graph::set_vertices(int no_vertices)
 {
@@ -45,6 +47,11 @@ void graph::get_input(char* file_name)
             file.close();
       }
       remove_duplicates();
+}
+void graph::add_edge(int x,int y)
+{
+      adj[x].push_back(y);
+      adj[y].push_back(x);
 }
 void graph::remove_duplicates()
 {
@@ -102,6 +109,11 @@ bool graph::is_bipartite()
 
       for(int i = 1;i<=n;i++)
       {
+            if(adj[i].size()<=0)
+            {
+                  continue;
+            }
+            
             if(color[i]!=-1)
             {
                   continue;
@@ -363,4 +375,84 @@ void graph::kernelized_output(std::vector<int> &cover)
             }
       }
       color.resize(n+1);
+}
+bool graph::clawfree_chk()
+{
+      std::vector<std::vector<int> > adj_copy;
+      adj_copy = adj;
+      std::vector<int> removed_vertices;
+
+
+      std::unordered_map<int, int> adj_mat[n+1];
+      for(int i = 0;i<=n;i++)
+      {
+            for(int j:adj_copy[i])
+            {
+                  adj_mat[i][j] = 1;
+            }
+      }
+
+      int number =0;
+
+      int flag = 0;
+
+      std::vector<std::pair<int,int>> greed_list;
+      for(int i = 1;i<=n;i++)
+      {
+            if(adj_copy[i].size()>0)
+                  greed_list.push_back(std::make_pair(adj_copy[i].size(),i));
+      }
+
+      sort(greed_list.begin(),greed_list.end());
+      reverse(greed_list.begin(),greed_list.end());
+
+      for(auto vertx : greed_list)
+      {
+            int i = vertx.second;
+            flag = 0;
+            for(int j = 0;j<adj_copy[i].size();j++)
+            {
+                  for(int k = j+1;k<adj_copy[i].size();k++)
+                  {
+                        if(adj_mat[adj_copy[i][j]][adj_copy[i][k]]==1)
+                        {continue;}
+
+                        for(int l = k+1;l<adj_copy[i].size();l++)
+                        {
+                              if(adj_mat[adj_copy[i][j]][adj_copy[i][l]]==1||adj_mat[adj_copy[i][k]][adj_copy[i][l]]==1)
+                              {
+                                    continue;
+                              }
+                              else
+                              {
+                                    number++;
+                                    flag = 1;
+                                    break;
+                              }
+                        }
+                        if(flag==1)
+                        {break;}
+                  }
+                  if(flag==1)
+                  {break;}
+            }
+            if(flag==1)
+            {
+                  for(auto idx : adj_copy[i])
+                  {
+                        int pos = std::lower_bound(adj_copy[idx].begin(),adj_copy[idx].end(),i)-adj_copy[idx].begin();
+                        if(adj_copy[idx][pos]==i)
+                        {
+                              adj_copy[idx].erase(adj_copy[idx].begin()+pos);
+                              adj_mat[idx][i] = 0;
+                              adj_mat[i][idx] = 0;
+                        }
+                  }
+                  adj_copy[i].clear();
+                  removed_vertices.push_back(i);
+            }
+      }
+
+      std::cout<<number<<"\n";//<<" No Claw\n";
+      return true;
 }
