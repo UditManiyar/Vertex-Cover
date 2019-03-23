@@ -109,11 +109,11 @@ bool graph::is_bipartite()
 
       for(int i = 1;i<=n;i++)
       {
-            if(adj[i].size()<=0)
-            {
-                  continue;
-            }
-            
+            // if(adj[i].size()<=0)
+            // {
+            //       continue;
+            // }
+
             if(color[i]!=-1)
             {
                   continue;
@@ -378,8 +378,8 @@ void graph::kernelized_output(std::vector<int> &cover)
 }
 bool graph::clawfree_chk()
 {
-      std::vector<std::vector<int> > adj_copy;
-      adj_copy = adj;
+      std::vector<std::vector<int> > adj_copy(adj);
+      // adj_copy = adj;
       std::vector<int> removed_vertices;
 
 
@@ -452,7 +452,23 @@ bool graph::clawfree_chk()
                   removed_vertices.push_back(i);
             }
       }
-
-      std::cout<<number<<"\n";//<<" No Claw\n";
+      //adj = adj_copy;
+      // std::cout<<number<<"\n";//<<" No Claw\n";
       return true;
+}
+void graph::print()
+{
+      for(int i= 0;i<=n;i++)
+      {
+            if(adj[i].size()==0)
+            {
+                  continue;
+            }
+            std::cout<<i<<"---->";
+            for(int j : adj[i])
+            {
+                  std::cout<<j<<" ";
+            }
+            std::cout<<"\n";
+      }
 }

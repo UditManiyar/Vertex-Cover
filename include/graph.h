@@ -25,5 +25,7 @@ public:
       void kernalization_network_flow();
       void kernelized_output(std::vector<int> &cover);
       bool clawfree_chk();
+      void print();
+
 };
 #endif // GRAPH_H

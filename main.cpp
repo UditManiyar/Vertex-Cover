@@ -1,25 +1,33 @@
 #include<iostream>
 #include "graph.h"
 #include "maxmatching.h"
+#include "clawfreeGraph.h"
 int main(int argv,char* arg[])
 {
       graph G;
       G.get_input(arg[1]);
 
-     int temp = 0;
+      int temp = 0;
 
      // do
      // {
      // //       temp = G.removed_edges;
-           int n = G.remaining_vertices();
-           while(G.reduction_rule1()||G.reduction_rule2())
-           {
+     int n = G.remaining_vertices();
+     while(G.reduction_rule1()||G.reduction_rule2())
+     {
 
-           }
+     }
 
-           std::cout<<n<<" ---- "<<G.v_cover.size()<<"\n";
-           G.clawfree_chk();
-           std::cout<<"\n";
+//      std::cout<<n<<" ---- "<<G.v_cover.size()<<"\n";
+     if(G.clawfree_chk()==true)
+     {
+           clawfreeGraph P(G);
+           P.solve(0);
+
+           std::cout<<P.ans<<"\n";
+     }
+
+           // std::cout<<"\n";
      // std::vector<std::pair<int,int> > sol = maxmatching::solve(G);
      //
      // std::cout<<sol.size();
