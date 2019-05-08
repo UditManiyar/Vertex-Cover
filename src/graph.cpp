@@ -133,6 +133,7 @@ void graph::Bipartite_matching_to_vcover(std::vector<std::pair<int,int>> matchin
 }
 void graph::remove_vertex(int idx)
 {
+      // std::cout<<idx<<", ";
       for(auto i : adj[idx])
       {
             int pos = std::lower_bound(adj[i].begin(),adj[i].end(),idx)-adj[i].begin();
@@ -453,7 +454,7 @@ bool graph::clawfree_chk()
             }
       }
       //adj = adj_copy;
-      // std::cout<<number<<"\n";//<<" No Claw\n";
+      std::cout<<number<<"\n";//<<" No Claw\n";
       return true;
 }
 void graph::print()

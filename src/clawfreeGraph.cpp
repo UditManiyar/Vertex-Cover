@@ -14,6 +14,7 @@ clawfreeGraph::clawfreeGraph(graph G)
             }
       }
 
+      MIS.resize(n+1,0);
 }
 
 void clawfreeGraph::solve(int idx)
@@ -34,23 +35,29 @@ void clawfreeGraph::solve(int idx)
             //Vertex idx is irregular
             if(regular==false)
             {
+                  std::unordered_set<int> dist2pnts = dist2points(idx);
+
                   //Reduce Irregular Point
                   std::cout<<idx<<"--->ir------";
-                  reduce_irregular(idx,complementSubgrph);
+                  reduce_irregular(idx,complementSubgrph,dist2pnts);
                   std::cout<<"\n";
                   ans+=2;
 
-                  return solve(idx+1);
+                  solve(idx+1);
+                  IrregularbacktracktheMIS(idx,complementSubgrph,dist2pnts);
+                  //Get back the independent set.
+                  return;
+
             }
             //Vertex is regular
             else
             {
-
+                  std::unordered_set<int> neighbourOfSet;
                   //Next...
-                  if(reducible_clique(left_clique))
+                  if(reducible_clique(left_clique,neighbourOfSet))
                   {
                         ans+=1;
-                        CliqueEdgesAdd(left_clique);
+                        CliqueEdgesAdd(left_clique,neighbourOfSet);
                         std::cout<<idx<<"---->rc";
                         remove_clique(left_clique);
                         std::cout<<"\n";
@@ -58,12 +65,11 @@ void clawfreeGraph::solve(int idx)
 
 
                   }
-
-                  else if(reducible_clique(right_clique))
+                  else if(reducible_clique(right_clique,neighbourOfSet))
                   {
 
                         ans+=1;
-                        CliqueEdgesAdd(right_clique);
+                        CliqueEdgesAdd(right_clique,neighbourOfSet);
                         std::cout<<idx<<"---->rc ------";
                         remove_clique(right_clique);
                         std::cout<<"\n";
@@ -84,6 +90,55 @@ void clawfreeGraph::solve(int idx)
       return solve(idx);
 }
 
+void clawfreeGraph::IrregularbacktracktheMIS(int idx,graph* complementSubgrph,std::unordered_set<int> &dist2pnts)
+{
+      int foo = 0;
+      int intersection_pt;
+      for(int i:dist2pnts)
+      {
+            if(MIS[i]==1)
+            {
+                  intersection_pt = i;
+                  foo = 1;
+                  break;
+            }
+      }
+      if(foo == 1)
+      {
+            std::unordered_set<int> temp;
+            for(int j : adj[idx])
+            {
+                  temp.insert(j);
+            }
+            for(int j: adj[intersection_pt])
+            {
+                  temp.erase(j);
+            }
+            for(int j :temp)
+            {
+                  for(int k:temp)
+                  {
+                        if(j>k&&adj_mat[std::make_pair(j,k)]==0)
+                        {
+                              MIS[j] = 1;
+                              MIS[k] = 1;
+                        }
+                  }
+            }
+
+            //N(a) - N(i) contains two non -adjacent pnts x,y add x,y in MIS;
+      }
+      else if(foo == 0)
+      {
+
+            //Find the smallest length cycle in the graph. get it into a vector x;
+            //Return x0,x1 i.e any two consecutive non-adjacent point...
+      }
+
+
+}
+
+
 void clawfreeGraph::remove_clique(std::vector<int> &clique)
 {
       for(int i:clique)
@@ -92,7 +147,7 @@ void clawfreeGraph::remove_clique(std::vector<int> &clique)
       }
 }
 
-void clawfreeGraph::CliqueEdgesAdd(std::vector<int> &clique)
+void clawfreeGraph::CliqueEdgesAdd(std::vector<int> &clique,std::unordered_set<int> &neighbourOfSet)
 {
       for(int i: neighbourOfSet)
       {
@@ -146,7 +201,7 @@ void clawfreeGraph::add_edge(int x,int y)
       }
       adj_mat[std::make_pair(y,x)] = 1;
 }
-bool clawfreeGraph::reducible_clique(std::vector<int> &clique)
+bool clawfreeGraph::reducible_clique(std::vector<int> &clique,std::unordered_set<int>&neighbourOfSet)
 {
       graph grph;
       grph.set_vertices(n);
@@ -192,14 +247,14 @@ bool clawfreeGraph::reducible_clique(std::vector<int> &clique)
 
       return flag;
 }
-void clawfreeGraph::reduce_irregular(int idx,graph* complementSubgrph)
+void clawfreeGraph::reduce_irregular(int idx,graph* complementSubgrph,std::unordered_set<int>dist2pnts)
 {
-      std::unordered_set<int> dist2pnts = dist2points(idx);
+      //std::unordered_set<int> dist2pnts = dist2points(idx);
       std::vector<int> Y;
 
       for(int i: dist2pnts)
       {
-            if(SubtractioninducesCompleteGraph(i,*complementSubgrph))
+            if(SubtractioninducesCompleteGraph(idx,i,*complementSubgrph))
             {
                   Y.push_back(i);
             }
@@ -250,8 +305,7 @@ void clawfreeGraph::remove_duplicates()
       }
       adj.clear();
       adj.resize(n+1);
-      //adj_mat.clear();
-      //set_vertices(n);
+
       for(auto edge: unique)
       {
             int x = edge.first;
@@ -285,15 +339,15 @@ void clawfreeGraph::remove_vertex(int idx)
 }
 
 
-bool clawfreeGraph::SubtractioninducesCompleteGraph(int i,graph subgrph)
+bool clawfreeGraph::SubtractioninducesCompleteGraph(int idx,int i,graph subgrph)
 {
       for(int j:adj[i])
       {
             subgrph.remove_vertex(j);
       }
-      for(int i = 0;i<=n;i++)
+      for(int k:adj[idx])
       {
-            if(adj[i].size()>0)
+            if(adj[k].size()>0)
             {
                   return false;
             }
@@ -318,11 +372,6 @@ std::unordered_set<int> clawfreeGraph::dist2points(int idx)
       }
       d2points.erase(idx);
 
-      // std::vector<int> final;
-
-      //for(int i:d2points)
-      // {final.push_back(i);}
-
       return d2points;
 }
 
@@ -335,22 +384,15 @@ bool clawfreeGraph::regularity_chk(int v,graph** complementSubgrph,std::vector<i
       {
             std::vector<int> color = (*complementSubgrph)->color;
 
-            //left_clique->set_vertices(n);
-            //right_clique->set_vertices(n);
-            //std::vector<int> left,right;
-
-
-            for(int i : neighbour)
+            for(int i : adj[v])
             {
                   if(color[i]==0)
                   {
                         left_clique.push_back(i);
-                        // marker_left[i] = 1;
                   }
                   else if(color[i]==1)
                   {
                         right_clique.push_back(i);
-                        // marker_right[i] = 1;
                   }
             }
             left_clique.push_back(v);
@@ -372,19 +414,11 @@ graph* clawfreeGraph::getComplementSubgraph(int v)
       graph* subgrph = new(graph);
       subgrph->set_vertices(n);
 
-      //std::vector<int> neighbour;
-      neighbour.clear();
-
-      for(int i :adj[v])
+      for(int i: adj[v])
       {
-            neighbour.push_back(i);
-      }
-
-      for(int i: neighbour)
-      {
-            for(int j:neighbour)
+            for(int j:adj[v])
             {
-                  if(i!=j&&adj_mat[std::make_pair(i,j)]==0)
+                  if(i>j&&adj_mat[std::make_pair(i,j)]==0)
                   {
                         subgrph->add_edge(i,j);
                   }
@@ -392,4 +426,8 @@ graph* clawfreeGraph::getComplementSubgraph(int v)
       }
       subgrph->remove_duplicates();
       return subgrph;
+}
+void clawfreeGraph::lineGraphtoGraph()
+{
+
 }

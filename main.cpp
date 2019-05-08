@@ -17,18 +17,27 @@ int main(int argv,char* arg[])
      {
 
      }
+    //  int cnt = 0;
+    //  for(int i = 0;i<=G.n;i++)
+    //  {
+    //        if(G.adj[i].size()>0)
+    //        {
+    //              cnt+= G.adj[i].size();
+    //       }
+    //  }
+    //  std::cout<<cnt/2<<"\n";
+    // // std::cout<<n<<" ---- "<<G.v_cover.size()<<"\n";
+     G.clawfree_chk();
 
-//      std::cout<<n<<" ---- "<<G.v_cover.size()<<"\n";
-     if(G.clawfree_chk()==true)
-     {
-           clawfreeGraph P(G);
-           P.solve(0);
 
-           std::cout<<P.ans<<"\n";
-     }
-
-           // std::cout<<"\n";
-     // std::vector<std::pair<int,int> > sol = maxmatching::solve(G);
+     // {
+     //       clawfreeGraph P(G);
+     //       P.solve(0);
+     //
+     //       std::cout<<P.ans<<"\n";
+     // }
+     //       std::cout<<"\n";
+     // // std::vector<std::pair<int,int> > sol = maxmatching::solve(G);
      //
      // std::cout<<sol.size();
      //
